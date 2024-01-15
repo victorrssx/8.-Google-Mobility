@@ -10,7 +10,7 @@
   
   pacman::p_load(tidyverse, rvest, xml2, # tidyverse e adjacentes 
                  janitor, lubridate, ggtext, ggrepel, extrafont, scales, ggalt, zoo,
-                 countrycode)
+                 countrycode, ggbrace, glue)
   pacman::p_loaded()
   
   options(timeout = max(1000, getOption("timeout")))
@@ -44,6 +44,8 @@
                     panel.grid.minor.y = element_blank(),
                     panel.grid.major = element_blank(),
                     panel.grid.minor.x = element_blank(),
+                    panel.background = element_rect(colour = "white"),
+                    plot.background = element_rect(colour = "white"),
                     plot.caption = element_markdown(hjust = -0.06, margin = unit(c(-5,0,0,0), "mm")))
   
   ini_pancovid = as.Date("2020-03-11")
@@ -61,11 +63,11 @@
       filter(country_region == "Brasil" & sub_region_1 == "") %>%
       select(Data, contains("mm7")) %>%
       pivot_longer(contains("mm7"), names_to = "tipo", values_to = "MM") %>% 
-      group_by(tipo) %>% 
       mutate(ano = year(Data),
              Data = case_when(year(Data) != 2020 ~ `year<-`(Data, 2020),
                               TRUE ~ Data),
-             tipo = gsub("_mm7", "", tipo)) %>% 
+             tipo = gsub("_mm7", "", tipo),
+             .by = tipo) %>% 
       
    {ggplot(., aes(x = Data, y = MM, group = interaction(tipo, ano), color = as.factor(ano))) +
       geom_hline(yintercept = 0, color = "black", size = 0.4) +
@@ -153,7 +155,7 @@
    
    
 
-   # Locais de Trabalho, Finais de semana 
+   # Locais de Trabalho, finais de semana 
    
    gmob %>%
      filter(sub_region_1 == "" & country_region == "Estados Unidos",
