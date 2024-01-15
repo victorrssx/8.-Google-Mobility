@@ -44,8 +44,8 @@
                     panel.grid.minor.y = element_blank(),
                     panel.grid.major = element_blank(),
                     panel.grid.minor.x = element_blank(),
-                    panel.background = element_rect(colour = "white"),
-                    plot.background = element_rect(colour = "white"),
+                    panel.background = element_rect(fill = "white", colour = "white"),
+                    plot.background = element_rect(fill = "white", colour = "white"),
                     plot.caption = element_markdown(hjust = -0.06, margin = unit(c(-5,0,0,0), "mm")))
   
   ini_pancovid = as.Date("2020-03-11")
