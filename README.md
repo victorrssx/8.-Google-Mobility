@@ -3,9 +3,10 @@
 
 #### Introdução
 
-Esse repositório contém o código usado para a produção das figuras
+Este repositório contém o código usado para a produção das figuras
 presentes no texto ‘Não deixe que os dados te enganem!’ (abaixo),
-publicado no dia 03 de janeiro de 2024. Foram utilizados principalmente
+publicado no dia 03 de janeiro de 2024. Um arquivo em `.ppt` com as
+imagens está disponível para download. Foram utilizados principalmente
 pacotes associados ao `tidyverse`, além de outros pacotes extras, como
 `extrafont`, `scales` e `countrycode`.
 
