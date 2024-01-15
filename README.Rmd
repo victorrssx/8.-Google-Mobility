@@ -31,7 +31,7 @@ Logo de cara vale a pergunta: **o que é o 'nível pré-pandemia'?** Ou, falando de
 
 -   **Outra implicação é a de que dados de dias úteis tendem a ser diferentes dos registrados aos finais de semana.** Se em tempos normais poucas pessoas já visitam locais de trabalho aos sábados e domingos, por exemplo, então a queda percentual em função de lockdowns tende a ser um valor naturalmente menor (gráfico 1). *Isso significa que o impacto das políticas contra Covid é menor nos finais de semana?* A resposta é *não*, pelo mesmo raciocínio anterior.
 
-    ![](images/clipboard-3031227040.png)
+    ![](images/clipboard-3031227041.png)
 
 ```{=html}
 <!-- -->
@@ -40,4 +40,4 @@ Logo de cara vale a pergunta: **o que é o 'nível pré-pandemia'?** Ou, falando de
 
     ![](images/clipboard-1923593520.png)
 
-De certa forma, o Google deixa bem claro as limitações dos dados. No fim das contas, esse textão todo é só para dizer uma coisa: cuidado com as conclusões precipitadas. Dados podem representar fatos mas isso não é condição suficiente para achar alguma coisa logo de cara. Nem tudo é o que parece.
+De certa forma, o Google deixa bem claro as limitações dos dados. No fim das contas, esse textão todo é só para dizer uma coisa: cuidado com as conclusões precipitadas. Dados podem representar fatos mas isso não é condição suficiente para achar alguma coisa logo de cara. Nem tudo é o que parece.

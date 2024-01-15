@@ -67,7 +67,7 @@ com que um analista tenha que ter certos cuidados na interpretação:
   que o impacto das políticas contra Covid é menor nos finais de
   semana?* A resposta é *não*, pelo mesmo raciocínio anterior.
 
-  ![](images/clipboard-3031227040.png)
+  ![](images/clipboard-3031227041.png)
 
 <!-- -->
 
@@ -89,5 +89,5 @@ com que um analista tenha que ter certos cuidados na interpretação:
 De certa forma, o Google deixa bem claro as limitações dos dados. No fim
 das contas, esse textão todo é só para dizer uma coisa: cuidado com as
 conclusões precipitadas. Dados podem representar fatos mas isso não é
-condição suficiente para achar alguma coisa logo de cara. Nem
-tudo é o que parece.
+condição suficiente para achar alguma coisa logo de cara. Nem tudo é o
+que parece.
