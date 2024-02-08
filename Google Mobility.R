@@ -10,7 +10,7 @@
   
   pacman::p_load(tidyverse, rvest, xml2, # tidyverse e adjacentes 
                  janitor, lubridate, ggtext, ggrepel, extrafont, scales, ggalt, zoo,
-                 countrycode, ggbrace, glue)
+                 countrycode, ggbrace, glue, arrow, vroom, officer)
   pacman::p_loaded()
   
   options(timeout = max(1000, getOption("timeout")))
@@ -18,12 +18,12 @@
   
   ## Importando dados
   
-  gmob = read.csv("https://www.gstatic.com/covid19/mobility/Global_Mobility_Report.csv") %>% 
+  gmob = read_csv("https://www.gstatic.com/covid19/mobility/Global_Mobility_Report.csv") %>% 
             select(-c(country_region_code, metro_area:place_id)) %>% 
             filter(country_region %in% c("Brazil", "Argentina", "Chile", "United States", "Portugal", "Germany")) %>%  
             relocate(date, .before = country_region) %>%
             set_names(c("Data", "country_region", "sub_region_1", "sub_region_2",
-                        "Varejo e Lazer", "Farmácia e Mercado", "Parques", "Estações de Transporte", "Locais de Trabalho", "Residencial")) %>%
+                        "Varejo e Lazer", "FarmÃ¡cia e Mercado", "Parques", "EstaÃ§Ãµes de Transporte", "Locais de Trabalho", "Residencial")) %>%
             mutate(Data = as.Date(Data),
                    across(c(2:7), ~ rollapply(.x,  7, mean, fill = NA, align = "right"), .names = "{.col}_mm7"), 
                    across(c(2:7), ~ rollapply(.x, 30, mean, fill = NA, align = "right"), .names = "{.col}_mm30"),
@@ -33,8 +33,7 @@
   
   
   
-  
-  ## Gráficos
+  ## GrÃ¡ficos
   
   tema_base = theme(plot.title = element_markdown(size = 23, family = "Comic Sans MS"),
                     plot.subtitle = element_markdown(size = 15, lineheight = 1.2),
@@ -60,7 +59,7 @@
    # Brasil mm7 
    
    gmob %>%
-      filter(country_region == "Brasil" & sub_region_1 == "") %>%
+      filter(country_region == "Brasil" & is.na(sub_region_1)) %>%
       select(Data, contains("mm7")) %>%
       pivot_longer(contains("mm7"), names_to = "tipo", values_to = "MM") %>% 
       mutate(ano = year(Data),
@@ -74,9 +73,9 @@
       geom_line(size = 1) +
       #annotate("rect", xmin = ini_pancovid, xmax = fim_pancovid, ymin = -Inf, ymax = Inf, alpha = .1) +
       labs(title = "**A Volta da Atividade no Brasil?**",
-           subtitle = paste("Apesar da divulgação ter sido encerrada no final de 2022, os dados de alta frequência do Google Mobility <br>",
-                            "permitem uma *proxy* da volta à normalidade no país."),
-           caption = " <br> Fonte: Elaboração própria a partir de dados do Google.",
+           subtitle = paste("Apesar da divulgaÃ§Ã£o ter sido encerrada no final de 2022, os dados de alta frequÃªncia do Google Mobility <br>",
+                            "permitem uma *proxy* da volta Ã  normalidade no paÃ­s."),
+           caption = " <br> Fonte: ElaboraÃ§Ã£o prÃ³pria a partir de dados do Google.",
            x = "",
            y = "") +
       scale_color_manual(values = RColorBrewer::brewer.pal(7, "RdBu")[c(1,5,7)], name = "") +
@@ -93,37 +92,37 @@
    
    
 
-   # Estados da Federação
+   # Estados da FederaÃ§Ã£o
    
    gmob %>% 
       select(Data, country_region, estado = sub_region_1, sub_region_2, contains("mm7")) %>%
       pivot_longer(contains("mm7"), names_to = "tipo", values_to = "MM") %>% 
-      filter(country_region == "Brasil" & estado != "" & sub_region_2 == "" & tipo %in% c("Varejo e Lazer_mm7")) %>% 
+      filter(country_region == "Brasil" & !is.na(estado) & is.na(sub_region_2) & tipo %in% c("Varejo e Lazer_mm7")) %>% 
       mutate(estado = case_when(estado == "Federal District"             ~ "Distrito Federal",
                                 estado == "State of Alagoas"             ~ "Alagoas",
                                 estado == "State of Amazonas"            ~ "Amazonas",
-                                estado == "State of Ceará"               ~ "Ceará",
-                                estado == "State of Goiás"               ~ "Goiás", 
+                                estado == "State of CearÃ¡"               ~ "CearÃ¡",
+                                estado == "State of GoiÃ¡s"               ~ "GoiÃ¡s", 
                                 estado == "State of Mato Grosso"         ~ "Mato Grosso",
                                 estado == "State of Minas Gerais"        ~ "Minas Gerais", 
-                                estado == "State of Paraíba"             ~ "Paraíba",
+                                estado == "State of ParaÃ­ba"             ~ "ParaÃ­ba",
                                 estado == "State of Pernambuco"          ~ "Pernambuco", 
                                 estado == "State of Rio de Janeiro"      ~ "Rio de Janeiro", 
                                 estado == "State of Rio Grande do Sul"   ~ "Rio Grande do Sul", 
                                 estado == "State of Roraima"             ~ "Roraima", 
-                                estado == "State of São Paulo"           ~ "São Paulo",
+                                estado == "State of SÃ£o Paulo"           ~ "SÃ£o Paulo",
                                 estado == "State of Tocantins"           ~ "Tocantins",
                                 estado == "State of Acre"                ~ "Acre", 
-                                estado == "State of Amapá"               ~ "Amapá",
+                                estado == "State of AmapÃ¡"               ~ "AmapÃ¡",
                                 estado == "State of Bahia"               ~ "Bahia",
-                                estado == "State of Espírito Santo"      ~ "Espírito Santo", 
-                                estado == "State of Maranhão"            ~ "Maranhão",
+                                estado == "State of EspÃ­rito Santo"      ~ "EspÃ­rito Santo", 
+                                estado == "State of MaranhÃ£o"            ~ "MaranhÃ£o",
                                 estado == "State of Mato Grosso do Sul"  ~ "Mato Grosso do Sul", 
-                                estado == "State of Pará"                ~ "Pará",
-                                estado == "State of Paraná"              ~ "Paraná",
-                                estado == "State of Piauí"               ~ "Piauí",
+                                estado == "State of ParÃ¡"                ~ "ParÃ¡",
+                                estado == "State of ParanÃ¡"              ~ "ParanÃ¡",
+                                estado == "State of PiauÃ­"               ~ "PiauÃ­",
                                 estado == "State of Rio Grande do Norte" ~ "Rio Grande do Norte",
-                                estado == "State of Rondônia"            ~ "Rondônia", 
+                                estado == "State of RondÃ´nia"            ~ "RondÃ´nia", 
                                 estado == "State of Santa Catarina"      ~ "Santa Catarina", 
                                 estado == "State of Sergipe"             ~ "Sergipe",
                                 T ~ as.character(estado))) %>%
@@ -135,9 +134,9 @@
       geom_hline(yintercept = 0, linetype = "dashed", color = "black", size = 1) +
       geom_line(size = 0.9) +
       labs(title = "**E os estados?**",
-           subtitle = "Varejo e Lazer, média móvel de 7 dias.",
+           subtitle = "Varejo e Lazer, mÃ©dia mÃ³vel de 7 dias.",
            x = "", y = "",
-           caption = "<br> Fonte: Elaboração própria a partir de dados do Google.") +
+           caption = "<br> Fonte: ElaboraÃ§Ã£o prÃ³pria a partir de dados do Google.") +
       scale_color_manual(values = RColorBrewer::brewer.pal(7, "RdBu")[c(1,5,7)], name = "") +
       scale_x_date(date_breaks = "3 months", date_labels = "%b") +
       scale_y_continuous(limits = c(-80, 100), breaks = c(-50, 0, 50, 100)) +
@@ -158,32 +157,32 @@
    # Locais de Trabalho, finais de semana 
    
    gmob %>%
-     filter(sub_region_1 == "" & country_region == "Estados Unidos",
+     filter(is.na(sub_region_1) & country_region == "Estados Unidos",
             Data <= "2020-06-30") %>% 
      select(Data, country_region, `Locais de Trabalho`) %>% 
      mutate(`Dia da Semana` = lubridate::wday(Data, label = T)) %>% 
      
      {ggplot(., aes(x = Data, y = `Locais de Trabalho`)) +
-         geom_col(aes(fill = ifelse(grepl('sáb|dom', `Dia da Semana`), 'Final de Semana', 'Dia Útil'))) +
+         geom_col(aes(fill = ifelse(grepl('sÃ¡b|dom', `Dia da Semana`), 'Final de Semana', 'Dia Ãštil'))) +
          scale_fill_manual(values = c('#f7a766', '#bc2b53')) +
          
          geom_hline(yintercept = 0, colour = "black") +
          
          geom_brace(aes(x = c(as.Date("2020-01-03"), as.Date("2020-02-06")), y = c(-2, -7)), inherit.data = F, rotate = 180) +
          annotate("richtext", x = as.Date("2020-01-20"), y = -12, size = 3.5, fill = "white", label.color = NA,
-                  label = "período que o Google usou <br> para calcular as medianas de <br> cada dia da semana") +
+                  label = "perÃ­odo que o Google usou <br> para calcular as medianas de <br> cada dia da semana") +
          
          coord_cartesian(xlim = c(as.Date("2020-01-01"), max(.$Data)), clip = 'off') + 
          #geom_segment(aes(x = as.Date("2020-06-25"), xend = as.Date("2020-07-05"), y = -65, yend = -65),
          #arrow = arrow(length = unit(0.1, "inches"))) +
          #annotate("richtext", x = as.Date("2020-06-30"), y = -62, size = 3.5, fill = "white", label.color = NA,
-         #label = "próximo gráfico") + 
+         #label = "prÃ³ximo grÃ¡fico") + 
          
          scale_x_date(breaks = c(as.Date("2020-01-01"), seq.Date(as.Date("2020-03-01"), as.Date("2020-07-01"), "1 month")),
                       date_labels = ifelse(c(as.Date("2020-01-01"), seq.Date(as.Date("2020-03-01"), as.Date("2020-07-01"), "1 month")) %in% as.Date("2020-01-01"), '%b/%y', '%b')) +
-         labs(title = "**Nem tudo parece o que é...** (1\\/2)",
-              subtitle = glue(paste("{ unique(.[2]) }, { colnames(.[3]) }, janela amostral entre março e junho de 2020. <br>")),
-              caption = " <br> Fonte: Elaboração própria a partir de dados do Google Mobility Report.",
+         labs(title = "**Nem tudo parece o que Ã©...** (1\\/2)",
+              subtitle = glue(paste("{ unique(.[2]) }, { colnames(.[3]) }, janela amostral entre marÃ§o e junho de 2020. <br>")),
+              caption = " <br> Fonte: ElaboraÃ§Ã£o prÃ³pria a partir de dados do Google Mobility Report.",
               x = "", y = "%", fill = "") +
          theme_minimal(base_size = 15) +
          tema_base +
@@ -197,10 +196,10 @@
    
    
 
-   # Comparação Hemisfério Norte e Sul
+   # ComparaÃ§Ã£o HemisfÃ©rio Norte e Sul
    
    gmob %>%
-     filter(sub_region_1 == "") %>% 
+     filter(is.na(sub_region_1)) %>% 
      select(Data, country_region, `Varejo e Lazer` = `Varejo e Lazer_mm30`, Parques = Parques_mm30) %>% 
      pivot_longer(3:4, names_to = "tipo", values_to = "valor") %>% 
      mutate(hemisferio = ifelse(country_region %in% c("Brasil", "Argentina", "Chile"), "Sul", "Norte")) %>% 
@@ -209,10 +208,10 @@
        geom_rect(data = verao_hn, aes(xmin = inicio, xmax = fim, ymin = -Inf, ymax = Inf), alpha = 0.1) +
        
        geom_line(data = ~ filter(., hemisferio ==  "Norte" & tipo == "Parques"), aes(x = Data, y = valor, color = country_region), size = 0.8) +
-       scale_color_manual(values = RColorBrewer::brewer.pal(9, "Blues")[c(5,7,9)], name = "Hemisfério Norte", guide = guide_legend(order = 1)) +
+       scale_color_manual(values = RColorBrewer::brewer.pal(9, "Blues")[c(5,7,9)], name = "HemisfÃ©rio Norte", guide = guide_legend(order = 1)) +
        ggnewscale::new_scale_color() +
        geom_line(data = ~ filter(., hemisferio == "Sul" & tipo == "Parques"), aes(x = Data, y = valor, color = country_region), size = 0.8) +
-       scale_color_manual(values = RColorBrewer::brewer.pal(9, "Reds")[c(5,7,9)], name = "Hemisfério Sul", guide = guide_legend(order = 2)) +
+       scale_color_manual(values = RColorBrewer::brewer.pal(9, "Reds")[c(5,7,9)], name = "HemisfÃ©rio Sul", guide = guide_legend(order = 2)) +
        
        geom_hline(yintercept = 0, colour = "black") +
        geom_vline(xintercept = as.Date("2022-10-15"), colour = "grey", linetype = 4, size = .8) +
@@ -221,15 +220,15 @@
        
        coord_cartesian(xlim = c(min(.$Data), max(.$Data)), clip = 'off') +
        annotate("richtext", x = as.Date("2023-03-01"), y = -75, size = 3.5, fill = "white", label.color = NA,
-                 label = "As séries foram <br> encerradas em <br> 15/10/2022") + 
+                 label = "As sÃ©ries foram <br> encerradas em <br> 15/10/2022") + 
        annotate("richtext", x = as.Date("2020-08-07"), y = 160, size = 3.5, fill = "transparent", label.color = NA,
-                label = "Verão no <br> Hemisf. Norte") + 
+                label = "VerÃ£o no <br> Hemisf. Norte") + 
        
        scale_y_continuous(breaks = seq(-90, 150, 30)) +
        scale_x_date(breaks = "3 months", labels = label_date_short(sep = "<br>")) +
-       labs(title = "**...e nem tudo é o que parece** (2\\/2)",
-            subtitle = "Parques, média móvel de 30 dias. <br>",
-            caption = " <br> Fonte: Elaboração própria a partir de dados do Google Mobility Report.",
+       labs(title = "**...e nem tudo Ã© o que parece** (2\\/2)",
+            subtitle = "Parques, mÃ©dia mÃ³vel de 30 dias. <br>",
+            caption = " <br> Fonte: ElaboraÃ§Ã£o prÃ³pria a partir de dados do Google Mobility Report.",
             x = "", y = "%") +
        theme_minimal(base_size = 15) +
        tema_base +
